@@ -1,0 +1,297 @@
+openapi: 3.0.3
+info:
+  title: Mini AI Studio Backend API
+  version: 1.0.0
+  description: |
+    API for authentication and image generations.
+    Base path `/api`, versioned under `/v1`.
+servers:
+  - url: http://localhost:5000/api
+    description: Local development
+tags:
+  - name: Health
+  - name: Auth
+  - name: Generations
+paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Health check
+      responses:
+        "200":
+          description: Server health information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+  /v1/auth/login:
+    post:
+      tags: [Auth]
+      summary: Login and receive a JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          {
+            description: Login success,
+            content:
+              {
+                application/json:
+                  { schema: { $ref: "#/components/schemas/LoginResponse" } },
+              },
+          }
+        "401":
+          {
+            description: Invalid credentials,
+            content:
+              {
+                application/json:
+                  { schema: { $ref: "#/components/schemas/ErrorResponse" } },
+              },
+          }
+        "404":
+          {
+            description: User not found,
+            content:
+              {
+                application/json:
+                  { schema: { $ref: "#/components/schemas/ErrorResponse" } },
+              },
+          }
+        "500":
+          {
+            description: Internal error,
+            content:
+              {
+                application/json:
+                  { schema: { $ref: "#/components/schemas/ErrorResponse" } },
+              },
+          }
+  /v1/auth/signup:
+    post:
+      tags: [Auth]
+      summary: Create a new user account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignupRequest"
+      responses:
+        "201":
+          {
+            description: User created,
+            content:
+              {
+                application/json:
+                  { schema: { $ref: "#/components/schemas/SignupResponse" } },
+              },
+          }
+        "409":
+          {
+            description: User exists,
+            content:
+              {
+                application/json:
+                  { schema: { $ref: "#/components/schemas/ErrorResponse" } },
+              },
+          }
+        "500":
+          {
+            description: Internal error,
+            content:
+              {
+                application/json:
+                  { schema: { $ref: "#/components/schemas/ErrorResponse" } },
+              },
+          }
+  /v1/generations:
+    get:
+      tags: [Generations]
+      summary: List recent generations
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 5
+          description: Number of most recent generations to return
+      responses:
+        "200":
+          description: Array of generation objects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Generation"
+        "401":
+          {
+            description: Unauthorized,
+            content:
+              {
+                application/json:
+                  { schema: { $ref: "#/components/schemas/ErrorResponse" } },
+              },
+          }
+        "500":
+          {
+            description: Internal error,
+            content:
+              {
+                application/json:
+                  { schema: { $ref: "#/components/schemas/ErrorResponse" } },
+              },
+          }
+    post:
+      tags: [Generations]
+      summary: Create a new generation request
+      description: Simulates 1-2s delay with 20% chance of model overload (503).
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GenerationCreateRequest"
+      responses:
+        "201":
+          {
+            description: Generation created,
+            content:
+              {
+                application/json:
+                  { schema: { $ref: "#/components/schemas/Generation" } },
+              },
+          }
+        "400":
+          {
+            description: Validation error,
+            content:
+              {
+                application/json:
+                  { schema: { $ref: "#/components/schemas/ValidationError" } },
+              },
+          }
+        "401":
+          {
+            description: Unauthorized,
+            content:
+              {
+                application/json:
+                  { schema: { $ref: "#/components/schemas/ErrorResponse" } },
+              },
+          }
+        "503":
+          {
+            description: Model overloaded,
+            content:
+              {
+                application/json:
+                  { schema: { $ref: "#/components/schemas/ErrorResponse" } },
+              },
+          }
+        "500":
+          {
+            description: Internal error,
+            content:
+              {
+                application/json:
+                  { schema: { $ref: "#/components/schemas/ErrorResponse" } },
+              },
+          }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    HealthResponse:
+      type: object
+      required: [status, uptime, timeStamp, message]
+      properties:
+        status: { type: string, example: healthy }
+        uptime: { type: number, example: 123.45 }
+        timeStamp: { type: string, format: date-time }
+        message: { type: string }
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 1 }
+    LoginResponse:
+      type: object
+      required: [message, user]
+      properties:
+        message: { type: string }
+        user:
+          type: object
+          required: [id, name, email, updatedAt, token]
+          properties:
+            id: { type: integer }
+            name: { type: string }
+            email: { type: string, format: email }
+            updatedAt: { type: string, format: date-time }
+            token: { type: string }
+    SignupRequest:
+      type: object
+      required: [name, email, password]
+      properties:
+        name: { type: string }
+        email: { type: string, format: email }
+        password: { type: string, minLength: 1 }
+    SignupResponse:
+      type: object
+      required: [message, user]
+      properties:
+        message: { type: string }
+        user:
+          type: object
+          required: [id, name, email, createdAt]
+          properties:
+            id: { type: integer }
+            name: { type: string }
+            email: { type: string, format: email }
+            createdAt: { type: string, format: date-time }
+    GenerationStatus:
+      type: string
+      enum: [PENDING, COMPLETED, FAILED]
+    Generation:
+      type: object
+      required: [id, prompt, createdAt, status]
+      properties:
+        id: { type: integer }
+        imageUrl: { type: string, nullable: true }
+        prompt: { type: string }
+        style: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+        status: { $ref: "#/components/schemas/GenerationStatus" }
+    GenerationCreateRequest:
+      type: object
+      required: [prompt]
+      properties:
+        prompt: { type: string, minLength: 1 }
+        style: { type: string, nullable: true }
+        imageUpload: { type: string, format: uri, nullable: true }
+    ErrorResponse:
+      type: object
+      required: [message]
+      properties:
+        message: { type: string }
+    ValidationError:
+      type: object
+      properties:
+        errors:
+          type: object
+          description: Zod flattened error structure
