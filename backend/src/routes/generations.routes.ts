@@ -1,8 +1,5 @@
 import { Router } from "express";
-import {
-  createGeneration,
-  listGenerations,
-} from "../controllers/generations.controller";
+import { createGeneration, listGenerations } from "../controllers/generations.controller";
 
 export const generationsRoutes = Router();
 

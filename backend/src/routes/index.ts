@@ -7,11 +7,7 @@ import { authenticateRequest } from "../middlewares/auth.middleware";
 export const routes = Router();
 
 routes.use(`${ENV.API_VERSION_1}${ROUTES.AUTH}`, authRoutes);
-routes.use(
-  `${ENV.API_VERSION_1}${ROUTES.GENERATIONS}`,
-  authenticateRequest,
-  generationsRoutes
-);
+routes.use(`${ENV.API_VERSION_1}${ROUTES.GENERATIONS}`, authenticateRequest, generationsRoutes);
 
 // routes.use(`/v1/auth`, authRoutes);
 

@@ -48,10 +48,7 @@ export const API = {
     );
     return res.data;
   },
-  async listGenerations(
-    token: string,
-    limit = 5
-  ): Promise<BackendGeneration[]> {
+  async listGenerations(token: string, limit = 5): Promise<BackendGeneration[]> {
     const res = await api.get("/v1/generations", {
       params: { limit },
       headers: { Authorization: `Bearer ${token}` },

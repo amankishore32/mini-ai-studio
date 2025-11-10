@@ -19,11 +19,9 @@ export const login = async (req: Request, res: Response) => {
     }
 
     //  If vaild data generate JWT
-    const token = jwt.sign(
-      { userId: user.id, email: user.email },
-      process.env.JWT_SECRET!,
-      { expiresIn: "1h" }
-    );
+    const token = jwt.sign({ userId: user.id, email: user.email }, process.env.JWT_SECRET!, {
+      expiresIn: "1h",
+    });
     res.status(200).json({
       message: "Login successful",
       user: {
@@ -34,7 +32,8 @@ export const login = async (req: Request, res: Response) => {
         token: token,
       },
     });
-  } catch (error) {
+  } catch {
+    // Error logged by Express error handler
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -60,7 +59,8 @@ export const signUp = async (req: Request, res: Response) => {
         createdAt: newUser.createdAt,
       },
     });
-  } catch (error) {
+  } catch {
+    // Error logged by Express error handler
     res.status(500).json({ message: "Internal server error" });
   }
 };
