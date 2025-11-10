@@ -16,15 +16,11 @@ interface UseGenerateReturn {
   handleAbort: () => void;
   setError: (error: string | null) => void;
   setResult: (result: Generation | null) => void;
-  setGenerations: (
-    gens: Generation[] | ((prev: Generation[]) => Generation[])
-  ) => void;
+  setGenerations: (gens: Generation[] | ((prev: Generation[]) => Generation[])) => void;
   fetchGenerations: () => Promise<void>;
 }
 
-export const useGenerate = ({
-  token,
-}: UseGenerateOptions): UseGenerateReturn => {
+export const useGenerate = ({ token }: UseGenerateOptions): UseGenerateReturn => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<Generation | null>(null);
@@ -40,8 +36,8 @@ export const useGenerate = ({
     try {
       const gens = await API.listGenerations(token, 5);
       setGenerations(gens);
-    } catch (e) {
-      console.error(e);
+    } catch {
+      // Silently handle fetch errors for now
     }
   }, [token]);
 

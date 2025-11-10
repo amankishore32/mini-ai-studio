@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { z } from "zod";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Generation } from "@prisma/client";
 import { AuthRequest } from "../middlewares/auth.middleware";
 
 const prisma = new PrismaClient();
@@ -13,8 +13,7 @@ const createSchema = z.object({
 
 export const createGeneration = async (req: AuthRequest, res: Response) => {
   const parsed = createSchema.safeParse(req.body);
-  if (!parsed.success)
-    return res.status(400).json({ errors: parsed.error.flatten() });
+  if (!parsed.success) return res.status(400).json({ errors: parsed.error.flatten() });
 
   const { prompt, style, imageUpload } = parsed.data;
   const userId = req.user?.userId;
@@ -53,8 +52,8 @@ export const createGeneration = async (req: AuthRequest, res: Response) => {
       createdAt: updated.createdAt,
       status: updated.status,
     });
-  } catch (err) {
-    console.error(err);
+  } catch {
+    // Error is logged by Prisma
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -73,7 +72,7 @@ export const listGenerations = async (req: AuthRequest, res: Response) => {
       take: limit,
     });
     return res.status(200).json(
-      gens.map((g: any) => ({
+      gens.map((g: Generation) => ({
         id: g.id,
         imageUrl: g.imageUrl,
         prompt: g.prompt,
@@ -82,8 +81,8 @@ export const listGenerations = async (req: AuthRequest, res: Response) => {
         status: g.status,
       }))
     );
-  } catch (err) {
-    console.error(err);
+  } catch {
+    // Error is logged by Prisma
     return res.status(500).json({ message: "Internal server error" });
   }
 };

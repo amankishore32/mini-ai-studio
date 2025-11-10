@@ -1,0 +1,283 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [master, main, tests, develop]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  # Install dependencies for both frontend and backend
+  install:
+    name: Install Dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            backend/node_modules
+            frontend/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install all dependencies
+        run: npm run install:all
+
+  # Lint and format checks
+  lint-and-format:
+    name: Lint & Format Check
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Restore node modules cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            backend/node_modules
+            frontend/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install dependencies (if cache miss)
+        run: npm run install:all
+
+      - name: Check code formatting
+        run: npm run format:check
+
+      - name: Lint code
+        run: npm run lint
+
+  # TypeScript type checking
+  typecheck:
+    name: TypeScript Type Check
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Restore node modules cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            backend/node_modules
+            frontend/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install dependencies (if cache miss)
+        run: npm run install:all
+
+      - name: Run TypeScript type check
+        run: npm run typecheck
+
+  # Backend tests with coverage
+  test-backend:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Restore node modules cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            backend/node_modules
+            frontend/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install dependencies (if cache miss)
+        run: npm run install:all
+
+      - name: Run backend tests with coverage
+        run: npm run test:coverage:backend
+
+      - name: Upload backend coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./backend/coverage/coverage-final.json
+          flags: backend
+          name: backend-coverage
+          fail_ci_if_error: false
+
+  # Frontend tests with coverage
+  test-frontend:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Restore node modules cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            backend/node_modules
+            frontend/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install dependencies (if cache miss)
+        run: npm run install:all
+
+      - name: Run frontend tests with coverage
+        run: npm run test:coverage:frontend
+
+      - name: Upload frontend coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./frontend/coverage/coverage-final.json
+          flags: frontend
+          name: frontend-coverage
+          fail_ci_if_error: false
+
+  # Build both projects
+  build:
+    name: Build Projects
+    runs-on: ubuntu-latest
+    needs: [lint-and-format, typecheck, test-backend, test-frontend]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Restore node modules cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            backend/node_modules
+            frontend/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install dependencies (if cache miss)
+        run: npm run install:all
+
+      - name: Build frontend
+        run: npm run build:frontend
+
+      - name: Build backend
+        run: npm run build:backend
+
+      - name: Upload frontend build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-build
+          path: frontend/dist/
+          retention-days: 7
+
+      - name: Upload backend build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-build
+          path: backend/dist/
+          retention-days: 7
+
+  # Generate and upload test summary
+  test-summary:
+    name: Test Summary
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend]
+    if: always()
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Restore node modules cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            backend/node_modules
+            frontend/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install dependencies (if cache miss)
+        run: npm run install:all
+
+      - name: Generate test summary
+        run: |
+          echo "# 📊 Test Results Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Backend Tests" >> $GITHUB_STEP_SUMMARY
+          npm run test:backend 2>&1 | tee backend-test-output.txt || true
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          tail -20 backend-test-output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Frontend Tests" >> $GITHUB_STEP_SUMMARY
+          npm run test:frontend 2>&1 | tee frontend-test-output.txt || true
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          tail -20 frontend-test-output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+  # Overall status check
+  ci-success:
+    name: CI Success
+    runs-on: ubuntu-latest
+    needs: [build, test-summary]
+    if: success()
+    steps:
+      - name: CI Success
+        run: |
+          echo "✅ All CI checks passed successfully!"
+          echo "- Linting: Passed"
+          echo "- Formatting: Passed"
+          echo "- Type Checking: Passed"
+          echo "- Backend Tests: Passed"
+          echo "- Frontend Tests: Passed"
+          echo "- Build: Passed"

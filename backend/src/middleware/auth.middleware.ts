@@ -5,11 +5,7 @@ export interface AuthenticatedRequest extends Request {
   userId?: number;
 }
 
-export const authenticate = (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-) => {
+export const authenticate = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({ message: "Unauthorized" });
@@ -22,7 +18,7 @@ export const authenticate = (
     };
     req.userId = payload.userId;
     next();
-  } catch (err) {
+  } catch {
     return res.status(401).json({ message: "Invalid token" });
   }
 };

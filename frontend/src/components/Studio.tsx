@@ -1,21 +1,10 @@
 import React, { useState, useEffect } from "react";
-import {
-  Camera,
-  LogOut,
-  Loader2,
-  AlertCircle,
-  CheckCircle,
-  X,
-  ImageIcon,
-} from "lucide-react";
+import { Camera, LogOut, Loader2, AlertCircle, CheckCircle, X, ImageIcon } from "lucide-react";
 import Upload from "./Upload";
 import { useGenerate } from "../hooks/useGenerate";
 import type { User, Generation } from "../types";
 
-const Studio: React.FC<{ user: User; onLogout: () => void }> = ({
-  user,
-  onLogout,
-}) => {
+const Studio: React.FC<{ user: User; onLogout: () => void }> = ({ user, onLogout }) => {
   const [imagePreview, setImagePreview] = useState<string>("");
   const [prompt, setPrompt] = useState("");
   const [style, setStyle] = useState("realistic");
@@ -83,10 +72,7 @@ const Studio: React.FC<{ user: User; onLogout: () => void }> = ({
                 onSelect={(file) => handleImageUpload(file)}
               />
               <div className="mb-4">
-                <label
-                  htmlFor="prompt"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
+                <label htmlFor="prompt" className="block text-sm font-medium text-gray-700 mb-2">
                   Prompt
                 </label>
                 <textarea
@@ -100,10 +86,7 @@ const Studio: React.FC<{ user: User; onLogout: () => void }> = ({
                 />
               </div>
               <div className="mb-4">
-                <label
-                  htmlFor="style"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
+                <label htmlFor="style" className="block text-sm font-medium text-gray-700 mb-2">
                   Style
                 </label>
                 <select
@@ -156,9 +139,7 @@ const Studio: React.FC<{ user: User; onLogout: () => void }> = ({
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h2 className="text-xl font-semibold mb-4">Recent Generations</h2>
               {generations.length === 0 ? (
-                <p className="text-gray-500 text-center py-8">
-                  No generations yet
-                </p>
+                <p className="text-gray-500 text-center py-8">No generations yet</p>
               ) : (
                 <div className="space-y-3">
                   {generations.map((gen) => (
@@ -175,15 +156,11 @@ const Studio: React.FC<{ user: User; onLogout: () => void }> = ({
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <span className="text-center text-xs font-medium">
-                            {gen.status}
-                          </span>
+                          <span className="text-center text-xs font-medium">{gen.status}</span>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">
-                          {gen.prompt}
-                        </p>
+                        <p className="text-sm font-medium text-gray-900 truncate">{gen.prompt}</p>
                         <p className="text-xs text-gray-500">
                           {new Date(gen.createdAt).toLocaleString()}
                         </p>
@@ -211,9 +188,7 @@ const Studio: React.FC<{ user: User; onLogout: () => void }> = ({
                 </div>
                 <div className="flex items-center gap-2 text-green-600 bg-green-50 p-3 rounded-lg">
                   <CheckCircle className="w-5 h-5" />
-                  <span className="text-sm font-medium">
-                    Status: {result.status}
-                  </span>
+                  <span className="text-sm font-medium">Status: {result.status}</span>
                 </div>
                 <div className="space-y-2 text-sm">
                   <p>
@@ -223,8 +198,7 @@ const Studio: React.FC<{ user: User; onLogout: () => void }> = ({
                     <strong>Style:</strong> {result.style}
                   </p>
                   <p>
-                    <strong>Created:</strong>{" "}
-                    {new Date(result.createdAt).toLocaleString()}
+                    <strong>Created:</strong> {new Date(result.createdAt).toLocaleString()}
                   </p>
                 </div>
               </div>

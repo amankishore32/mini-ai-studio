@@ -3,9 +3,7 @@ import { Camera, Loader2, AlertCircle } from "lucide-react";
 import { API } from "../services/api";
 import type { User } from "../types";
 
-export const Auth: React.FC<{ onLogin: (user: User) => void }> = ({
-  onLogin,
-}) => {
+export const Auth: React.FC<{ onLogin: (user: User) => void }> = ({ onLogin }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -35,9 +33,7 @@ export const Auth: React.FC<{ onLogin: (user: User) => void }> = ({
     }
   };
 
-  const handleKeyPress = (
-    e: React.KeyboardEvent<HTMLFormElement | HTMLInputElement>
-  ) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLFormElement | HTMLInputElement>) => {
     if (e.key === "Enter" && !loading) {
       // Convert to a synthetic submit event
       handleSubmit({ preventDefault: () => {} } as React.FormEvent);
@@ -58,10 +54,7 @@ export const Auth: React.FC<{ onLogin: (user: User) => void }> = ({
         <div className="space-y-4">
           {!isLogin && (
             <div>
-              <label
-                htmlFor="name"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
                 Name
               </label>
               <input
@@ -77,10 +70,7 @@ export const Auth: React.FC<{ onLogin: (user: User) => void }> = ({
             </div>
           )}
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
               Email
             </label>
             <input
@@ -96,10 +86,7 @@ export const Auth: React.FC<{ onLogin: (user: User) => void }> = ({
           </div>
 
           <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
               Password
             </label>
             <input
@@ -152,9 +139,7 @@ export const Auth: React.FC<{ onLogin: (user: User) => void }> = ({
           }}
           className="w-full mt-4 text-purple-600 hover:text-purple-700 text-sm"
         >
-          {isLogin
-            ? "Don't have an account? Sign up"
-            : "Already have an account? Log in"}
+          {isLogin ? "Don't have an account? Sign up" : "Already have an account? Log in"}
         </button>
       </div>
     </div>
