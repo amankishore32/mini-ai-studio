@@ -17,4 +17,22 @@ model User {
   password String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
+  generations Generation[]
+}
+
+enum GenerationStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+model Generation {
+  id        Int              @id @default(autoincrement())
+  prompt    String
+  style     String?
+  imageUrl  String?
+  status    GenerationStatus @default(PENDING)
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id])
+  userId    Int
 }

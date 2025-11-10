@@ -1,4 +1,5 @@
 import express, { Application } from "express";
+import cors from "cors";
 import dotenv from "dotenv";
 import { ENV } from "./config/constants";
 import { routes } from "./routes";
@@ -15,6 +16,12 @@ const app: Application = express();
 
 //  Middleware to parse JSON bodies
 app.use(express.json());
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN?.split(",") || "*",
+    credentials: true,
+  })
+);
 
 //  Registering all routes with API prefix
 app.use(`${ENV.API}`, routes);

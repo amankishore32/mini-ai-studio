@@ -1,12 +1,11 @@
 import { Router } from "express";
-import { login, signUp } from "../controllers/auth.controller";
 import {
   createGeneration,
-  getGenerations,
+  listGenerations,
 } from "../controllers/generations.controller";
 
 export const generationsRoutes = Router();
 
-// Define your authentication routes here
-generationsRoutes.post("/create", createGeneration);
-generationsRoutes.get("/", getGenerations);
+// Mounted at `${ENV.API_VERSION_1}${ROUTES.GENERATIONS}` in routes/index.ts
+generationsRoutes.post("/", createGeneration);
+generationsRoutes.get("/", listGenerations);
