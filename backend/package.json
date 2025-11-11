@@ -6,14 +6,14 @@
   "scripts": {
     "dev": "nodemon ./src/server.ts",
     "build": "tsc",
-    "start": "node ./dist/src/server.js",
-    "lint": "eslint . --fix",
-    "format": "prettier --write \"**/*.{ts,js,json}\"",
-    "format:check": "prettier --check \"**/*.{ts,js,json}\"",
+    "start": "node ./dist/server.js",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "postinstall": "npx prisma generate --schema=prisma/schema.prisma"
+    "lint": "eslint . --fix",
+    "format": "prettier --write \"**/*.{ts,js,json}\"",
+    "format:check": "prettier --check \"**/*.{ts,js,json}\"",
+    "postinstall": "npx prisma generate --schema=prisma/schema.prisma || echo 'Prisma generate skipped'"
   },
   "keywords": [],
   "author": "",

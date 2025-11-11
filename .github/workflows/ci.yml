@@ -95,6 +95,9 @@ jobs:
       - name: Install dependencies (if cache miss)
         run: npm run install:all
 
+      - name: Generate Prisma Client
+        run: cd backend && npx prisma generate
+
       - name: Run TypeScript type check
         run: npm run typecheck
 
@@ -124,6 +127,15 @@ jobs:
 
       - name: Install dependencies (if cache miss)
         run: npm run install:all
+
+      - name: Setup environment variables
+        run: |
+          echo "DATABASE_URL=file:./test.db" > backend/.env
+          echo "JWT_SECRET=test_secret_for_ci" >> backend/.env
+          echo "PORT=4000" >> backend/.env
+
+      - name: Generate Prisma Client
+        run: cd backend && npx prisma generate
 
       - name: Run backend tests with coverage
         run: npm run test:coverage:backend
@@ -164,7 +176,7 @@ jobs:
         run: npm run install:all
 
       - name: Run frontend tests with coverage
-        run: npm run test:coverage:frontend
+        run: cd frontend && npm run test:coverage -- --run
 
       - name: Upload frontend coverage to Codecov
         uses: codecov/codecov-action@v3
@@ -200,6 +212,9 @@ jobs:
 
       - name: Install dependencies (if cache miss)
         run: npm run install:all
+
+      - name: Generate Prisma Client
+        run: cd backend && npx prisma generate
 
       - name: Build frontend
         run: npm run build:frontend
@@ -249,18 +264,28 @@ jobs:
       - name: Install dependencies (if cache miss)
         run: npm run install:all
 
+      - name: Setup environment variables
+        run: |
+          echo "DATABASE_URL=file:./test.db" > backend/.env
+          echo "JWT_SECRET=test_secret_for_ci" >> backend/.env
+
+      - name: Generate Prisma Client
+        run: cd backend && npx prisma generate
+
       - name: Generate test summary
         run: |
           echo "# 📊 Test Results Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## Backend Tests" >> $GITHUB_STEP_SUMMARY
-          npm run test:backend 2>&1 | tee backend-test-output.txt || true
+          cd backend && npm test 2>&1 | tee ../backend-test-output.txt || true
+          cd ..
           echo '```' >> $GITHUB_STEP_SUMMARY
           tail -20 backend-test-output.txt >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## Frontend Tests" >> $GITHUB_STEP_SUMMARY
-          npm run test:frontend 2>&1 | tee frontend-test-output.txt || true
+          cd frontend && npm test -- --run 2>&1 | tee ../frontend-test-output.txt || true
+          cd ..
           echo '```' >> $GITHUB_STEP_SUMMARY
           tail -20 frontend-test-output.txt >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
