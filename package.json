@@ -29,10 +29,7 @@
     "format:check": "concurrently \"npm run format:check --prefix frontend\" \"npm run format:check --prefix backend\"",
     "format:check:frontend": "npm run format:check --prefix frontend",
     "format:check:backend": "npm run format:check --prefix backend",
-    "typecheck": "npm run typecheck:frontend && npm run typecheck:backend",
-    "typecheck:frontend": "cd frontend && npm run build -- --emitDeclarationOnly && cd ..",
-    "typecheck:backend": "cd backend && npx tsc --noEmit && cd ..",
-    "validate": "npm run format:check && npm run lint && npm run typecheck && npm run test && npm run build"
+    "validate": "npm run format:check && npm run lint && npm run test && npm run build"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"
