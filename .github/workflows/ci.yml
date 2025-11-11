@@ -22,7 +22,7 @@ jobs:
           cache: "npm"
 
       - name: Cache node modules
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             node_modules
@@ -51,7 +51,7 @@ jobs:
           cache: "npm"
 
       - name: Restore node modules cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             node_modules
@@ -84,7 +84,7 @@ jobs:
           cache: "npm"
 
       - name: Restore node modules cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             node_modules
@@ -131,7 +131,7 @@ jobs:
           cache: "npm"
 
       - name: Restore node modules cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             node_modules
@@ -169,7 +169,7 @@ jobs:
           cache: "npm"
 
       - name: Restore node modules cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             node_modules
@@ -190,14 +190,14 @@ jobs:
         run: npm run build:backend
 
       - name: Upload frontend build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: frontend-build
           path: frontend/dist/
           retention-days: 7
 
       - name: Upload backend build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: backend-build
           path: backend/dist/
@@ -220,7 +220,7 @@ jobs:
           cache: "npm"
 
       - name: Restore node modules cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             node_modules
